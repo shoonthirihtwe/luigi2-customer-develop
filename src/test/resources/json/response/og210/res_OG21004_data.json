@@ -1,0 +1,95 @@
+{
+	"commonInfo": {
+		"contractNo": "0000000101",
+		"contractBranchNo": "02",
+		"salesPlanName": "ペット保険 ベーシック",
+		"contractorNameKnj": "渚商会"
+	},
+	"basicInfo": {
+		"contractNo": "0000000101",
+		"contractBranchNo": "02",
+		"contractStatus": "40",
+		"salesMethod": "02",
+		"applicationDate": "/Date(1625842800000)/",
+		"completeDate": "/Date(1627743600000)/",
+		"effectiveDate": "/Date(1627743600000)/",
+		"updateCnt": "2",
+		"issueDate": "/Date(1659279600000)/",
+		"expirationDate": "/Date(1690729200000)/"
+	},
+	"productInfo": {
+		"salesPlanNameDisplay": "ペット保険 ベーシック",
+		"benefitInfo": [
+			{
+				"benefitText": "通院費用補償",
+				"benefitBaseAmount": "5000"
+			}
+		]
+	},
+	"contractorInfo": {
+		"contractorCustomerId": "000000003045",
+		"contractorNameKnj": "渚商会",
+		"contractorNameKana": "ナギサショウカイ",
+		"contractorZipcode": "8171532",
+		"contractorTel": "0978-2-6819",
+		"contractorEmail": "ichainbase.test02@gmail.com"
+	},
+	"insuredInfo": {
+		"insuredCustomerId": "000000003042",
+		"insuredNameKnj": "山村　浩一",
+		"insuredNameKana": "ヤマムラ　コウイチ",
+		"insuredDateOfBirth": "/Date(834073200000)/",
+		"insuredSex": "1",
+		"relationship": "04",
+		"insuredZipcode": "0294342",
+		"insuredTel": "019-978-4241"
+	},
+	"premiumInfo": {
+		"premium": "1100",
+		"frequency": "12",
+		"paymentMethod": "3"
+	},
+	"agencyInfo": {
+		"agencyName1": "株式会社iChain",
+		"agentName1": "駒形　裕子",
+		"agentShare1": "85",
+		"agencyName2": "筒井産業株式会社",
+		"agentName2": "百目木　道彦",
+		"agentShare2": "15"
+	},
+	"noticeInfo": {
+		"noticeText1": "1:1",
+		"noticeText2": "1:1"
+	},
+	"maintenanceRequestInfo": [
+		{
+			"transactionCode": "11",
+			"receivedDate": "/Date(1638457200000)/",
+			"applyDate": "/Date(1638543600000)/"
+		}
+	],
+	"paymentInfo": [
+		{
+			"receivedDate": "/Date(1756566000000)/",
+			"dueDate": "/Date(175SS6738800000)/"
+		},
+		{
+			"receivedDate": "/Date(1733670000000)/",
+			"dueDate": "/Date(1733842800000)/"
+		}
+	],
+	"billingInfo": [
+		{
+			"premiumDueDate": "/Date(1651330800000)",
+			"frequency": "12",
+			"paymentMethodCode": "3",
+			"depositDate": "/Date(1651330800000)"
+		},
+		{
+			"premiumDueDate": "/Date(1648738800000)/",
+			"frequency": "12",
+			"paymentMethodCode": "3",
+			"depositDate": "/Date(1648738800000)/"
+		}
+	]
+}

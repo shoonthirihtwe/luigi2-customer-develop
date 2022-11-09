@@ -1,0 +1,18 @@
+[
+	{
+		"customerId": "000000003042",
+		"nameKana": "ヤマムラ コウイチ",
+		"nameKnj": "山村 浩一",
+		"dateOfBirth": "/Date(834073200000)/",
+		"sex": "1",
+		"zipCode": "0294342"
+	},
+	{
+		"customerId": "000000003052",
+		"nameKana": "ヤマモト ユミコ",
+		"nameKnj": "山元 裕美子",
+		"dateOfBirth": "/Date(193244400000)/",
+		"sex": "2",
+		"zipCode": "3940031"
+	}
+]

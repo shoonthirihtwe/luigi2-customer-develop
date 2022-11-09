@@ -1,0 +1,41 @@
+{
+	"commonInfo": {
+		"contractorCustomerId": "000000003042",
+		"contractorNameKnj": "山村 浩一",
+		"contractorNameKana": "ヤマムラ コウイチ",
+		"contractorDateOfBirth": "/Date(834073200000)/",
+		"contractorSex": "1",
+		"contractorZipcode": "0294342",
+		"contractorEmail": "ichainbase.test02@gmail.com",
+		"contractorTel": "019-978-4241"
+	},
+	"contractList": [
+		{
+			"contractNo": "0000000102",
+			"productName": "ペット保険 プレミアム",
+			"nameKnj": "渚商会",
+			"nameKana": "ナギサショウカイ",
+			"sex": "3"
+		},
+		{
+			"contractNo": "0000000103",
+			"productName": "家財保険 スタンダート",
+			"contractStatus": "60",
+			"issueDate": "/Date(1627743600000)/",
+			"nameKnj": "渚商会",
+			"nameKana": "ナギサショウカイ",
+			"sex": "3"
+		}
+	],
+	"insuredContractList": [
+		{
+			"contractNo": "0000000101",
+			"productName": "ペット保険 ベーシック",
+			"contractStatus": "40",
+			"issueDate": "/Date(1659279600000)/",
+			"nameKnj": "渚商会",
+			"nameKana": "ナギサショウカイ",
+			"sex": "3"
+		}
+	]
+}

@@ -1,0 +1,91 @@
+{
+	"commonInfo": {
+		"contractNo": "0000000103",
+		"contractBranchNo": "01",
+		"salesPlanName": "家財保険 スタンダート",
+		"contractorNameKnj": "山村　浩一"
+	},
+	"basicInfo": {
+		"contractNo": "0000000103",
+		"contractBranchNo": "01",
+		"contractStatus": "60",
+		"salesMethod": "02",
+		"applicationDate": "/Date(1625842800000)/",
+		"completeDate": "/Date(1627743600000)/",
+		"effectiveDate": "/Date(1627743600000)/",
+		"updateCnt": "1",
+		"issueDate": "/Date(1627743600000)/",
+		"expirationDate": "/Date(1640876400000)/"
+	},
+	"productInfo": {
+		"salesPlanNameDisplay": "家財保険 スタンダート",
+		"benefitInfo": [
+			{
+				"benefitText": "家財損害補償",
+				"benefitBaseAmount": "400000"
+			},
+			{
+				"benefitText": "臨時費用補償",
+				"benefitBaseAmount": "120000"
+			}
+		]
+	},
+	"contractorInfo": {
+		"contractorCustomerId": "000000003042",
+		"contractorNameKnj": "山村　浩一",
+		"contractorNameKana": "ヤマムラ　コウイチ",
+		"contractorDateOfBirth": "/Date(834073200000)/",
+		"contractorZipcode": "0294342",
+		"contractorTel": "019-978-4241",
+		"contractorEmail": "ichainbase.test02@gmail.com"
+	},
+	"insuredInfo": {
+		"insuredCustomerId": "000000003045",
+		"insuredNameKnj": "渚商会",
+		"insuredNameKana": "ナギサショウカイ",
+		"relationship": "04",
+		"insuredZipcode": "8171532",
+		"insuredTel": "0978-2-6819"
+	},
+	"premiumInfo": {
+		"premium": "1300",
+		"frequency": "12",
+		"paymentMethod": "3"
+	},
+	"agencyInfo": {
+		"agencyName1": "株式会社iChain",
+		"agentName1": "駒形　裕子",
+		"agentShare1": "100",
+		"agentShare2": "0"
+	},
+	"noticeInfo": {
+		"noticeText1": "1:2",
+		"noticeText2": "1:2"
+	},
+	"maintenanceRequestInfo": [
+		{
+			"transactionCode": "41",
+			"receivedDate": "/Date(1696086000000)/",
+			"applyDate": "/Date(1693494000000)/"
+		},
+		{
+			"transactionCode": "11",
+			"receivedDate": "/Date(1667228400000)/",
+			"applyDate": "/Date(1667228400000)/"
+		}
+	],
+	"billingInfo": [
+		{
+			"premiumDueDate": "/Date(1696086000000)/",
+			"frequency": "12",
+			"paymentMethodCode": "3",
+			"depositDate": "/Date(1696086000000)/"
+		},
+		{
+			"premiumDueDate": "/Date(1693494000000)/",
+			"frequency": "12",
+			"paymentMethodCode": "3",
+			"depositDate": "/Date(1693494000000)/"
+		}
+	]
+}

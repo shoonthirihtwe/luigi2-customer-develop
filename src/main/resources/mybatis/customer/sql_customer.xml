@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.co.ichain.luigi2.mapper.CustomerMapper">
+	<sql id="sql_searchCustomers">
+		FROM 
+			customers c
+			LEFT JOIN customers_individual ci ON c.customer_id=ci.customer_id
+				AND c.tenant_id=ci.tenant_id
+			LEFT JOIN customers_corporate cc ON c.customer_id=cc.customer_id
+				AND c.tenant_id=cc.tenant_id
+		<where>
+			c.tenant_id =#{tenantId}
+			<if test="keyword != null">
+				AND ( ci.name_kana_mei LIKE CONCAT('%', #{keyword}, '%') 
+            	or ci.name_kana_sei LIKE CONCAT('%', #{keyword}, '%') 
+            	or cc.corp_name_kana LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+			<if test="name != null">
+				AND ( ci.name_kana_mei LIKE CONCAT('%', #{name}, '%') 
+            	or ci.name_kana_sei LIKE CONCAT('%', #{name}, '%') 
+            	or cc.corp_name_kana LIKE CONCAT('%', #{name}, '%'))
+            </if>
+            <if test="year != null">
+            	AND DATE_FORMAT(ci.date_of_birth, '%Y')=#{year}
+            </if>
+            <if test="month != null">
+            	AND DATE_FORMAT(ci.date_of_birth, '%m')=#{month}
+            </if>
+            <if test="day != null">
+            	AND DATE_FORMAT(ci.date_of_birth, '%d')=#{day}
+            </if>
+            <if test="sex != null">
+            	<choose>
+					<when test="sex == 3">
+						AND c.corporate_individual_flag='2'
+            		</when>
+            		<otherwise>
+            			AND ci.sex=#{sex}
+            		</otherwise>
+            	</choose>
+            </if>
+        </where>
+	</sql>
+	<select id="getCustomerWithName" resultType="CustomersListVo" parameterType="hashmap">
+		SELECT 
+			c.customer_id customerId,
+			(CASE c.corporate_individual_flag WHEN 1 THEN
+			concat(ci.name_kana_sei,' ',ci.name_kana_mei)
+			WHEN 2 THEN cc.corp_name_kana END) as nameKana, 
+			(CASE c.corporate_individual_flag WHEN 1 THEN 
+			concat(ci.name_knj_sei,' ',ci.name_knj_mei) 
+			WHEN 2 THEN cc.corp_name_official END) as nameKnj,
+			(CASE c.corporate_individual_flag WHEN 1 THEN 
+			ci.date_of_birth END) as dateOfBirth,
+			(CASE c.corporate_individual_flag WHEN 1 THEN 
+			ci.sex WHEN 2 THEN '3' END) as sex,
+			(CASE c.corporate_individual_flag WHEN 1 THEN 
+			ci.addr_zip_code
+			WHEN 2 THEN cc.corp_addr_zip_code END) as zipCode
+		<include refid="sql_searchCustomers"></include>
+		ORDER BY 
+			name_kana_mei, name_kana_sei, corp_name_kana
+	</select> 
+	<select id="searchCustomers" resultType="CustomersListVo" parameterType="hashmap">
+		SELECT 
+			c.customer_id customerId,
+			(CASE c.corporate_individual_flag WHEN 1 THEN
+			concat(ci.name_kana_sei,' ',ci.name_kana_mei)
+			WHEN 2 THEN cc.corp_name_kana END) as nameKana, 
+			(CASE c.corporate_individual_flag WHEN 1 THEN 
+			concat(ci.name_knj_sei,' ',ci.name_knj_mei) 
+			WHEN 2 THEN cc.corp_name_official END) as nameKnj,
+			(CASE c.corporate_individual_flag WHEN 1 THEN 
+			ci.date_of_birth END) as dateOfBirth,
+			(CASE c.corporate_individual_flag WHEN 1 THEN 
+			ci.sex WHEN 2 THEN '3' END) as sex,
+			(CASE c.corporate_individual_flag WHEN 1 THEN 
+			ci.addr_zip_code
+			WHEN 2 THEN cc.corp_addr_zip_code END) as zipCode
+			<include refid="sql_searchCustomers"></include>
+		ORDER BY 
+			name_kana_mei, name_kana_sei, corp_name_kana
+		<if test='rowCount != null'>
+			LIMIT #{page}, #{rowCount}
+		</if>
+	</select>
+ 
+	<select id="searchContractsTotalCount"  resultType="int" parameterType="hashmap">
+		SELECT count(*)
+		<include refid="sql_searchCustomers"></include>
+	</select>
+	
+	<resultMap type="CustomerDetailCommonInfoVo" id="CustomerDetailCommonInfoVo">
+		<result column="contractNo" property="contractNo" />
+		<result column="contractBranchNo" property="contractBranchNo" />
+		<result column="contractorNameKnj" property="contractorNameKnj" />
+		<result column="salesPlanName" property="salesPlanName" />
+	</resultMap>
+	<resultMap type="CustomerDetailBasicInfoVo" id="CustomerDetailBasicInfoVo">
+		<result column="contractNo" property="contractNo" />
+		<result column="contractBranchNo" property="contractBranchNo" />
+		<result column="contractStatus" property="contractStatus" />
+		<result column="salesMethod" property="salesMethod" />
+		<result column="applicationDate" property="applicationDate" />
+		<result column="completeDate" property="completeDate" />
+		<result column="effectiveDate" property="effectiveDate" />
+		<result column="updateCnt" property="updateCnt" />
+		<result column="issueDate" property="issueDate" />
+		<result column="expirationDate" property="expirationDate" />
+	</resultMap>
+	<resultMap type="CustomerDetailProductInfoVo" id="CustomerDetailProductInfoVo">
+		<result column="salesPlanName" property="salesPlanNameDisplay" />
+	</resultMap>
+	<resultMap type="CustomerDetailContractorInfoVo" id="CustomerDetailContractorInfoVo">
+		<result column="contractorCustomerId" property="contractorCustomerId" />
+		<result column="contractorNameKnj" property="contractorNameKnj" />
+		<result column="contractorNameKana" property="contractorNameKana" />
+		<result column="contractorSex" property="contractorSex" />
+		<result column="contractorDateOfBirth" property="contractorDateOfBirth" />
+		<result column="contractorZipcode" property="contractorZipcode" />
+		<result column="contractorTel" property="contractorTel" />
+		<result column="contractorEmail" property="contractorEmail" />
+	</resultMap>
+	<resultMap type="CustomerDetailInsuredInfoVo" id="CustomerDetailInsuredInfoVo">
+		<result column="insuredCustomerId" property="insuredCustomerId" />
+		<result column="insuredNameKnj" property="insuredNameKnj" />
+		<result column="insuredNameKana" property="insuredNameKana" />
+		<result column="insuredDateOfBirth" property="insuredDateOfBirth" />
+		<result column="insuredSex" property="insuredSex" />
+		<result column="relationship" property="relationship" />
+		<result column="insuredZipcode" property="insuredZipcode" />
+		<result column="insuredTel" property="insuredTel" />
+	</resultMap>
+	<resultMap type="CustomerDetailPremiumInfoVo" id="CustomerDetailPremiumInfoVo">
+		<result column="premium" property="premium" />
+		<result column="frequency" property="frequency" />
+		<result column="paymentMethod" property="paymentMethod" />
+	</resultMap>
+	<resultMap type="CustomerDetailAgencyInfoVo" id="CustomerDetailAgencyInfoVo">
+		<result column="agencyName1" property="agencyName1" />
+		<result column="agentName1" property="agentName1" />
+		<result column="agentShare1" property="agentShare1" />
+		<result column="agencyName2" property="agencyName2" />
+		<result column="agentName2" property="agentName2" />
+		<result column="agentShare2" property="agentShare2" />
+	</resultMap>
+	<resultMap type="CustomerDetailNoticeInfoVo" id="CustomerDetailNoticeInfoVo">
+		<result column="noticeText1" property="noticeText1" />
+		<result column="noticeText2" property="noticeText2" />
+		<result column="noticeText3" property="noticeText3" />
+		<result column="noticeText4" property="noticeText4" />
+	</resultMap>
+	<resultMap type="CustomerDetailMaintenanceRequestInfoVo" id="CustomerDetailMaintenanceRequestInfoVo">
+		<result column="transactionCode" property="transactionCode" />
+		<result column="receivedDate" property="receivedDate" />
+		<result column="applyDate" property="applyDate" />
+	</resultMap>
+	<resultMap type="CustomerDetailPaymentInfoVo" id="CustomerDetailPaymentInfoVo">
+		<result column="receivedDate" property="receivedDate" />
+		<result column="secondUnderwriter" property="secondUnderwriter" />
+		<result column="dueDate" property="dueDate" />
+	</resultMap>
+	<resultMap type="CustomerDetailBillingInfoVo" id="CustomerDetailBillingInfoVo">
+		<result column="frequency" property="frequency" />
+		<result column="premiumDueDate" property="premiumDueDate" />
+		<result column="paymentMethodCode" property="paymentMethodCode" />
+		<result column="depositDate" property="depositDate" />
+	</resultMap>
+	<resultMap id="customerContractDetailMap" type="jp.co.ichain.luigi2.vo.CustomerContractDetailVo" autoMapping="true">
+		<collection property="commonInfo" resultMap="CustomerDetailCommonInfoVo">
+		</collection>
+		<collection property="basicInfo" resultMap="CustomerDetailBasicInfoVo">
+		</collection>
+		<collection property="productInfo" resultMap="CustomerDetailProductInfoVo">
+		</collection>
+		<collection property="contractorInfo" resultMap="CustomerDetailContractorInfoVo">
+		</collection>
+		<collection property="insuredInfo" resultMap="CustomerDetailInsuredInfoVo">
+		</collection>
+		<collection property="premiumInfo" resultMap="CustomerDetailPremiumInfoVo">
+		</collection>
+		<collection property="agencyInfo" resultMap="CustomerDetailAgencyInfoVo">
+		</collection>
+		<collection property="noticeInfo" resultMap="CustomerDetailNoticeInfoVo">
+		</collection>
+		<collection property="maintenanceRequestInfo" resultMap="CustomerDetailMaintenanceRequestInfoVo">
+		</collection>
+		<collection property="paymentInfo" resultMap="CustomerDetailPaymentInfoVo">
+		</collection>
+		<collection property="billingInfo" resultMap="CustomerDetailBillingInfoVo">
+		</collection>
+	</resultMap>
+	<resultMap id="customerDetailMap" type="jp.co.ichain.luigi2.vo.CustomerDetailVo" autoMapping="true">
+		<collection property="commonInfo" resultMap="CustomerDetailContractorInfoVo">
+		</collection>
+	</resultMap>
+	<select id="getCustomerContractWithContractNo" resultMap="customerContractDetailMap" parameterType="hashmap">
+		SELECT 
+			<!-- 共通情報 -->
+			c.contract_no as contractNo,
+			c.contract_branch_no as contractBranchNo,
+			sp.sales_plan_name_display as salesPlanName, 
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			concat(ci.name_knj_sei,'　',ci.name_knj_mei) 
+			WHEN 2 THEN cc.corp_name_official END) as contractorNameKnj,
+			
+			<!-- 契約情報-基本情報 -->
+			c.contract_no as contractNo,
+			c.contract_branch_no as contractBranchNo,
+			c.contract_status as contractStatus,
+			c.sales_method as salesMethod,
+			c.application_date as applicationDate,
+			c.complete_date as completeDate,
+			c.effective_date as effectiveDate,
+			c.update_cnt as updateCnt,
+			c.issue_date as issueDate,
+			(CASE WHEN CAST(c.contract_status AS UNSIGNED) >= 50 THEN c.termination_date
+			ELSE c.expiration_date END) as expirationDate,
+			<!-- 契約情報-商品情報 -->
+			sp.sales_plan_name_display as salesPlanName,
+			
+			<!-- 契約情報-契約者情報 -->
+			c.contractor_customer_id as contractorCustomerId,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			concat(ci.name_knj_sei,'　',ci.name_knj_mei) 
+			WHEN 2 THEN cc.corp_name_official END) as contractorNameKnj,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN
+			concat(ci.name_kana_sei,'　',ci.name_kana_mei)
+			WHEN 2 THEN cc.corp_name_kana END) as contractorNameKana,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			ci.date_of_birth END) as contractorDateOfBirth,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN ci.addr_zip_code 
+			WHEN 2 THEN cc.corp_addr_zip_code END) as contractorZipcode,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN ci.addr_tel1
+			WHEN 2 THEN cc.contact_addr_tel1 END) as contractorTel,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN ci.email
+			WHEN 2 THEN cc.contact_email END) as contractorEmail,
+			<!-- 契約情報-被保険者情報 -->
+			c.insured_customer_id as insuredCustomerId,
+			(CASE icu.corporate_individual_flag WHEN 1 THEN 
+			concat(ici.name_knj_sei,'　',ici.name_knj_mei) 
+			WHEN 2 THEN icc.corp_name_official END) as insuredNameKnj,
+			(CASE icu.corporate_individual_flag WHEN 1 THEN
+			concat(ici.name_kana_sei,'　',ici.name_kana_mei)
+			WHEN 2 THEN icc.corp_name_kana END) as insuredNameKana,
+			(CASE icu.corporate_individual_flag WHEN 1 THEN 
+			ici.date_of_birth END) as insuredDateOfBirth,
+			(CASE icu.corporate_individual_flag WHEN 1 THEN 
+			ici.sex END) as insuredSex,
+			c.relationship as relationship,
+			(CASE icu.corporate_individual_flag WHEN 1 THEN ici.addr_zip_code 
+			WHEN 2 THEN icc.corp_addr_zip_code END) as insuredZipcode,
+			(CASE icu.corporate_individual_flag WHEN 1 THEN ici.addr_tel1
+			WHEN 2 THEN icc.contact_addr_tel1 END) as insuredTel,
+			<!-- 告知情報 -->
+			(CONCAT(u.question_1,':' ,u.question_1_text)) as noticeText1,
+			(CONCAT(u.question_2,':' ,u.question_2_text)) as noticeText2,
+			(CONCAT(u.question_3,':' ,u.question_3_text)) as noticeText3,
+			(CONCAT(u.question_4,':' ,u.question_4_text)) as noticeText4,
+			<!-- 契約情報-保険料情報 -->
+			c.premium as premium,
+			c.frequency as frequency,
+			c.payment_method as paymentMethod,	
+			<!-- 契約情報-募集代理店情報 -->
+			a1.agency_name_official as agencyName1,
+			CONCAT(sa1.agent_name_knj_sei,'　',sa1.agent_name_knj_mei) as agentName1,
+			c.agent_share_1 as agentShare1,
+			a2.agency_name_official as agencyName2,
+			CONCAT(sa2.agent_name_knj_sei,'　',sa2.agent_name_knj_mei) as agentName2,
+			c.agent_share_2 as agentShare2
+		FROM 
+			contracts c
+			LEFT JOIN customers cu ON c.contractor_customer_id=cu.customer_id
+				AND c.tenant_id=cu.tenant_id
+			LEFT JOIN customers icu ON c.insured_customer_id=icu.customer_id
+				AND c.tenant_id=icu.tenant_id
+			LEFT JOIN sales_products sp ON c.sales_plan_code=sp.sales_plan_code
+				AND c.tenant_id=sp.tenant_id
+			LEFT JOIN customers_individual ci ON c.contractor_customer_id=ci.customer_id
+				AND c.tenant_id=ci.tenant_id
+			LEFT JOIN customers_corporate cc ON c.contractor_customer_id=cc.customer_id
+				AND c.tenant_id=cc.tenant_id
+			LEFT JOIN customers_individual ici ON c.insured_customer_id=ici.customer_id
+				AND c.tenant_id=ici.tenant_id
+			LEFT JOIN customers_corporate icc ON c.insured_customer_id=icc.customer_id
+				AND c.tenant_id=icc.tenant_id
+			LEFT JOIN insured_objects io ON c.contract_no=io.contract_no
+				AND c.tenant_id=io.tenant_id
+			LEFT JOIN risk_headers rh ON c.contract_no=rh.contract_no
+				AND rh.contract_branch_no=c.contract_branch_no
+				AND c.tenant_id=rh.tenant_id
+			LEFT JOIN underwritings u ON c.contract_no=u.contract_no
+				AND c.tenant_id=u.tenant_id
+			LEFT JOIN substandards s ON c.contract_no=s.contract_no
+				AND c.tenant_id=s.tenant_id
+			LEFT JOIN policy_holders_pay_method phpm ON c.contract_no=phpm.contract_no
+				AND c.tenant_id=phpm.tenant_id
+			LEFT JOIN premium_headers ph ON c.contract_no=ph.contract_no
+				AND c.contract_branch_no=ph.contract_branch_no
+				AND c.tenant_id=ph.tenant_id
+			LEFT JOIN deposit_details dd ON c.contract_no=dd.contract_no
+				AND dd.premium_due_date=ph.premium_due_date
+				AND c.tenant_id=dd.tenant_id
+			LEFT JOIN deposit_headers dh ON dd.batch_no=dh.batch_no
+				AND dd.entry_date=dh.entry_date
+				AND c.tenant_id=dh.tenant_id 
+			LEFT JOIN claim_headers ch ON c.contract_no=ch.contract_no
+				AND c.contract_branch_no=ch.contract_branch_no
+				AND c.tenant_id=ch.tenant_id
+			LEFT JOIN maintenance_requests mr ON c.contract_no=mr.contract_no 
+				AND c.contract_branch_no=mr.contract_branch_no
+				AND c.tenant_id=mr.tenant_id
+			LEFT JOIN agencies a1 ON c.agency_code_1=a1.agency_code
+				AND c.tenant_id=a1.tenant_id
+			LEFT JOIN sales_agents sa1 ON c.agent_code_1=sa1.agent_code
+				AND c.tenant_id=sa1.tenant_id
+			LEFT JOIN agencies a2 ON c.agency_code_2=a2.agency_code
+				AND c.tenant_id=a2.tenant_id
+			LEFT JOIN sales_agents sa2 ON c.agent_code_2=sa2.agent_code
+				AND c.tenant_id=sa2.tenant_id
+		WHERE
+			c.tenant_id =#{tenantId}
+			AND c.contract_no=#{contractNo}
+			<choose>
+			<when test="contractBranchNo == null">
+			AND	c.contract_branch_no IN
+			(
+			SELECT MAX(contract_branch_no) as contract_branch_no 
+			FROM contracts 
+			WHERE 
+				tenant_id =#{tenantId} 
+				AND contract_no=#{contractNo}
+			)
+			</when>
+			<otherwise>
+			AND c.contract_branch_no=#{contractBranchNo}
+			</otherwise>
+			</choose>
+			LIMIT 1
+	</select>
+	<select id="getCustomerBillingInfoList" resultMap="CustomerDetailBillingInfoVo" parameterType="hashmap">
+			<!-- 収納情報  -->
+		SELECT
+			ph.id as id,
+			ph.premium_due_date as premiumDueDate,
+			ph.frequency as frequency,
+			a1.payment_method_code as paymentMethodCode,
+			ph.effective_date as depositDate
+		FROM (
+		SELECT 
+			bd.tenant_id,
+			bd.premium_due_date,
+			bd.contract_no,
+			bd.contract_branch_no,
+			bd.billing_period,
+			bd.payment_method_code,
+			bh.create_date
+		FROM billing_details bd  LEFT JOIN billing_headers bh
+		ON bh.tenant_id=bd.tenant_id AND bh.billing_period=bd.billing_period AND bh.payment_method_code=bd.payment_method_code AND bh.billng_header_no=bd.billng_header_no
+		WHERE bd.tenant_id =#{tenantId} AND bd.contract_no=#{contractNo} AND bd.contract_branch_no=#{contractBranchNo} AND bh.tenant_id=bd.tenant_id
+		) a1 JOIN (
+		SELECT 
+			bd.tenant_id,
+			bd.premium_due_date,
+			max(bh.create_date) as create_date
+		FROM billing_details bd  LEFT JOIN billing_headers bh
+		ON bh.tenant_id=bd.tenant_id AND bh.billing_period=bd.billing_period AND bh.payment_method_code=bd.payment_method_code AND bh.billng_header_no=bd.billng_header_no
+		WHERE bd.tenant_id =#{tenantId} AND bd.contract_no=#{contractNo} AND bd.contract_branch_no=#{contractBranchNo} AND bh.tenant_id=bd.tenant_id
+		GROUP BY bd.tenant_id, bd.premium_due_date
+		) a2 ON a1.tenant_id=a2.tenant_id AND a1.premium_due_date=a2.premium_due_date AND a1.create_date=a2.create_date
+			JOIN premium_headers ph ON a1.contract_no=ph.contract_no AND a1.contract_branch_no=ph.contract_branch_no AND a1.tenant_id=ph.tenant_id AND a1.premium_due_date=ph.premium_due_date
+
+		ORDER BY ph.premium_due_date DESC
+	</select>
+	<select id="getCustomerPaymentInfoList" resultType="CustomerDetailPaymentInfoVo" parameterType="hashmap">
+		SELECT 
+			<!-- 支払情報 -->
+			ch.id as id,
+			ch.received_date as receivedDate,
+			ch.second_underwriting_date as secondUnderwritingDate,
+			ch.due_date as dueDate
+		FROM 
+			contracts c
+			INNER JOIN claim_headers ch ON c.contract_no=ch.contract_no
+				AND c.contract_branch_no=ch.contract_branch_no
+				AND c.tenant_id=ch.tenant_id
+			WHERE
+			c.tenant_id =#{tenantId}
+			AND c.contract_no=#{contractNo}
+			AND c.contract_branch_no=#{contractBranchNo}
+			ORDER BY ch.received_date DESC
+	</select>
+	<select id="getCustomerMaintenanceRequestInfoList" resultType="CustomerDetailMaintenanceRequestInfoVo" parameterType="hashmap">
+		SELECT 
+			mr.id as id,
+			mr.transaction_code as transactionCode,
+			mr.received_date as receivedDate,
+			mr.apply_date as applyDate
+		FROM 
+			contracts c
+			INNER JOIN maintenance_requests mr ON c.contract_no=mr.contract_no 
+				AND c.contract_branch_no=mr.contract_branch_no
+				AND c.tenant_id=mr.tenant_id
+			WHERE
+			c.tenant_id =#{tenantId}
+			AND c.contract_no=#{contractNo}
+			AND c.contract_branch_no=#{contractBranchNo}
+			ORDER BY mr.received_date DESC
+	</select>
+	<select id="getCustomerWithCustomerId" resultMap="customerDetailMap" parameterType="hashmap">
+		SELECT 
+			<!-- 契約情報-基本情報 -->
+			cu.customer_id as contractorCustomerId,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			concat(ci.name_knj_sei,' ',ci.name_knj_mei) 
+			WHEN 2 THEN cc.corp_name_official END) as contractorNameKnj,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN
+			concat(ci.name_kana_sei,' ',ci.name_kana_mei)
+			WHEN 2 THEN cc.corp_name_kana END) as contractorNameKana,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			ci.sex WHEN 2 THEN '3' END) as contractorSex,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			ci.date_of_birth END) as contractorDateOfBirth,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN ci.addr_zip_code 
+			WHEN 2 THEN cc.corp_addr_zip_code END) as contractorZipcode,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN ci.addr_tel1
+			WHEN 2 THEN cc.contact_addr_tel1 END) as contractorTel,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN ci.email
+			WHEN 2 THEN cc.contact_email END) as contractorEmail
+			
+		FROM 
+			customers cu
+			LEFT JOIN customers_individual ci ON ci.customer_id=cu.customer_id
+				AND cu.tenant_id=ci.tenant_id
+			LEFT JOIN customers_corporate cc ON cc.customer_id=cu.customer_id
+				AND cu.tenant_id=cc.tenant_id
+		WHERE
+			cu.tenant_id =#{tenantId}
+			AND cu.customer_id=#{customerId}
+		LIMIT 1
+	</select>
+	<select id="getContractInfo" resultType="CustomerContractInfoVo" parameterType="hashmap">
+		SELECT 
+			<!-- 契約情報-基本情報 -->
+			c.contract_no as contractNo,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			concat(ci.name_knj_sei,' ',ci.name_knj_mei) 
+			WHEN 2 THEN cc.corp_name_official END) as nameKnj,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN
+			concat(ci.name_kana_sei,' ',ci.name_kana_mei)
+			WHEN 2 THEN cc.corp_name_kana END) as nameKana,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			ci.sex WHEN 2 THEN '3' END) as sex,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			ci.date_of_birth END) as dateOfBirth,
+			c.contract_status as contractStatus,
+			c.issue_date as issueDate,
+			sp.sales_plan_name_display as productName
+		FROM 
+			customers cu
+			LEFT JOIN (SELECT * from contracts c1 INNER JOIN (
+				SELECT 
+					contract_no as c2_contract_no,
+					tenant_id as c2_tenant_id, 
+					max(contract_branch_no) as c2_contract_branch_no 
+			FROM contracts group by tenant_id, contract_no
+            ) c2 ON c1.contract_no=c2.c2_contract_no 
+            AND c1.tenant_id=c2.c2_tenant_id 
+            AND c1.contract_branch_no=c2.c2_contract_branch_no) as c
+            	ON c.insured_customer_id=cu.customer_id
+			  	AND c.tenant_id=cu.tenant_id
+			LEFT JOIN customers_individual ci ON ci.customer_id=c.insured_customer_id
+				AND c.tenant_id=ci.tenant_id
+			LEFT JOIN customers_corporate cc ON cc.customer_id=c.insured_customer_id
+				AND c.tenant_id=cc.tenant_id
+			LEFT JOIN sales_products sp ON c.sales_plan_code=sp.sales_plan_code
+				AND c.tenant_id=sp.tenant_id
+				AND c.sales_plan_type_code=sp.sales_plan_type_code
+		WHERE
+			c.tenant_id =#{tenantId}
+			AND c.contractor_customer_id=#{customerId}
+	</select>
+	<select id="getInsuredContractInfo" resultType="CustomerContractInfoVo" parameterType="hashmap">
+		SELECT 
+			<!-- 契約情報-基本情報 -->
+			c.contract_no as contractNo,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			concat(ci.name_knj_sei,' ',ci.name_knj_mei) 
+			WHEN 2 THEN cc.corp_name_official END) as nameKnj,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN
+			concat(ci.name_kana_sei,' ',ci.name_kana_mei)
+			WHEN 2 THEN cc.corp_name_kana END) as nameKana,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			ci.sex WHEN 2 THEN '3' END) as sex,
+			(CASE cu.corporate_individual_flag WHEN 1 THEN 
+			ci.date_of_birth END) as dateOfBirth,
+			c.contract_status as contractStatus,
+			c.issue_date as issueDate,
+			sp.sales_plan_name_display as productName
+		FROM 
+			customers cu
+		
+			LEFT JOIN (SELECT * from contracts c1 INNER JOIN (
+				SELECT 
+					contract_no as c2_contract_no,
+					tenant_id as c2_tenant_id, 
+					max(contract_branch_no) as c2_contract_branch_no 
+			FROM contracts 
+			group by tenant_id,contract_no
+            ) c2 ON c1.contract_no=c2.c2_contract_no AND c1.tenant_id=c2.c2_tenant_id AND c1.contract_branch_no=c2.c2_contract_branch_no) as c
+				ON c.contractor_customer_id=cu.customer_id
+			  	AND c.tenant_id=cu.tenant_id
+			LEFT JOIN customers_individual ci ON ci.customer_id=c.contractor_customer_id
+				AND c.tenant_id=ci.tenant_id
+			LEFT JOIN customers_corporate cc ON cc.customer_id=c.contractor_customer_id
+				AND c.tenant_id=cc.tenant_id
+			LEFT JOIN sales_products sp ON c.sales_plan_code=sp.sales_plan_code
+				AND c.tenant_id=sp.tenant_id
+				AND c.sales_plan_type_code=sp.sales_plan_type_code
+		WHERE
+			c.tenant_id =#{tenantId}
+			AND c.insured_customer_id=#{customerId}
+			
+	</select>
+	<select id="getBillingInfo" resultType="BillingInfoVo" parameterType="hashmap">
+		SELECT 
+			ph.premium_due_date as premiumDueDate,
+			dh.deposit_date as depositDate,
+			bd.payment_method_code as paymentMethodCode,
+			(CASE bd.payment_method_code WHEN 4 THEN bd.bank_code END) as bankCode,
+			(CASE bd.payment_method_code WHEN 4 THEN bd.bank_branch_code END) as bankBranchCode,
+			(CASE bd.payment_method_code WHEN 4 THEN bd.bank_account_type END) as bankAccountType, 
+			(CASE bd.payment_method_code WHEN 4 THEN bd.bank_account_no END) as bankAccountNo
+		FROM 
+			premium_headers ph
+			LEFT JOIN billing_details bd ON ph.contract_no=bd.contract_no
+				AND bd.premium_due_date=ph.premium_due_date
+				AND ph.tenant_id=bd.tenant_id
+			LEFT JOIN deposit_details dd ON ph.contract_no=dd.contract_no
+				AND dd.premium_due_date=ph.premium_due_date
+				AND ph.tenant_id=dd.tenant_id
+			LEFT JOIN deposit_headers dh ON dd.entry_date=dh.entry_date
+				AND dd.batch_no=dh.batch_no
+				AND ph.tenant_id=dh.tenant_id
+		WHERE
+			ph.id=#{id}
+			AND ph.tenant_id =#{tenantId}
+			AND ph.contract_no=#{contractNo}
+		LIMIT 1
+	</select>
+	<select id="getPaymentInfo" resultType="PaymentInfoVo" parameterType="hashmap">
+		SELECT 
+			ch.received_date as receivedDate,
+			ch.due_date as dueDate,
+			CONCAT(ch.claimant_sei_knj,' ',claimant_mei_knj) as claimantKnj,
+			ch.bank_code as bankCode,
+			ch.bank_branch_code as bankBranchCode,
+			ch.bank_account_type as bankAccountType, 
+			ch.bank_account_no as bankAccountNo
+		FROM 
+			claim_headers ch
+		WHERE
+			ch.id=#{id}
+			AND ch.tenant_id =#{tenantId}
+			AND ch.contract_no=#{contractNo}
+	</select>
+	<select id="getBenefitInfo" resultType="CustomerBenefitInfoVo" parameterType="hashmap">
+		SELECT
+				benefit_text as benefitText,
+				benefit_base_amount as benefitBaseAmount
+			 FROM 
+				risk_headers
+			WHERE 
+				contract_no=#{contractNo}
+				AND contract_branch_no=#{contractBranchNo}
+				AND tenant_id=#{tenantId}
+			ORDER BY risk_sequence_no ASC
+	</select>
+	<select id="getMaintenanceRequestInfo" resultType="CustomerDetailMaintenanceRequestInfoVo" parameterType="hashmap">
+		SELECT 
+			mr.id as id,
+            mr.request_no as requestNo,
+            c.contract_no as contractNo,
+            c.contract_branch_no as contractBranchNo,
+            mr.request_status as requestStatus,
+			mr.transaction_code as transactionCode,
+			mr.received_date as receivedDate,
+			mr.apply_date as applyDate,
+			mr.application_method as applicationMethod,
+			md.document_title as documentTitle,
+			md.document_url as documentUrl,
+			mr.comment_underweiter1 as commentUnderweiter1,
+			mr.comment_underweiter2 as commentUnderweiter2,
+			(CASE (SELECT count(*) FROM refund_amount
+			 WHERE contract_no=#{contractNo} 
+			 AND tenant_id=#{tenantId} AND request_no=mr.request_no) WHEN 0 THEN '2'
+			 ELSE '1' END) as refundYn,
+			cl.description as description
+		FROM
+			contracts c
+			LEFT JOIN maintenance_requests mr ON c.contract_no=mr.contract_no 
+				AND c.contract_branch_no=mr.contract_branch_no
+				AND c.tenant_id=mr.tenant_id
+			LEFT JOIN contract_log cl ON cl.contract_no=mr.contract_no 
+				AND cl.contact_transaction_code=mr.transaction_code
+				AND mr.tenant_id=cl.tenant_id
+			LEFT JOIN maintenance_documents md ON mr.request_no=md.request_no
+				AND mr.tenant_id=md.tenant_id
+			WHERE
+			c.tenant_id =#{tenantId}
+			AND mr.id=#{id}
+			AND c.contract_no=#{contractNo}
+		ORDER BY mr.received_date DESC
+	</select>
+</mapper>

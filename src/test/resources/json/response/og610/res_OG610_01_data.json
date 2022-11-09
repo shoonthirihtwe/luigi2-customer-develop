@@ -1,0 +1,45 @@
+{
+	"commonInfo": {
+		"contractorCustomerId": "000000003052",
+		"contractorNameKnj": "山元 裕美子",
+		"contractorNameKana": "ヤマモト ユミコ",
+		"contractorDateOfBirth": "/Date(193244400000)/",
+		"contractorSex": "2",
+		"contractorZipcode": "3940031",
+		"contractorEmail": "ichainbase.test02@gmail.com",
+		"contractorTel": "0260-2-3045"
+	},
+	"contractList": [
+		{
+			"contractNo": "0000000105",
+			"productName": "ペット保険 プレミアム",
+			"contractStatus": "40",
+			"issueDate": "/Date(1627743600000)/",
+			"nameKnj": "山元 裕美子",
+			"nameKana": "ヤマモト ユミコ",
+			"dateOfBirth": "/Date(193244400000)/",
+			"sex": "2"
+		}
+	],
+	"insuredContractList": [
+		{
+			"contractNo": "0000000105",
+			"productName": "ペット保険 プレミアム",
+			"contractStatus": "40",
+			"issueDate": "/Date(1627743600000)/",
+			"nameKnj": "山元 裕美子",
+			"nameKana": "ヤマモト ユミコ",
+			"dateOfBirth": "/Date(193244400000)/",
+			"sex": "2"
+		},
+		{
+			"contractNo": "0000000106",
+			"productName": "家財保険 スタンダート",
+			"contractStatus": "40",
+			"issueDate": "/Date(1627743600000)/",
+			"nameKnj": "細谷通商",
+			"nameKana": "ホソヤツウショウ",
+			"sex": "3"
+		}
+	]
+}
